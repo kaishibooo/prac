@@ -34,4 +34,23 @@ dependencies {
 	compileOnly('org.springframework.boot:spring-boot-configuration-processor')
 	compileOnly('org.projectlombok:lombok')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+
+	//log4jdbc-log4j2 を使用してSQLを出力する
+	compile("org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16")
+	//logback.xml で if condition 文を使用できるようにするために
+	//Janino libraryをインストール
+	compile("org.codehaus.janino:janino:2.7.5")
+
+	//Apache Commons Lang の StringUtils を使用
+	compile("org.apache.commons:commons-lang3:3.3.2")
+}
+
+bootRun {
+//    jvmArgs = ['-Dspring.profiles.active=product']
+    jvmArgs = ['-Dspring.profiles.active=develop']
+}
+
+test {
+//    jvmArgs = ['-Dspring.profiles.active=product']
+    jvmArgs = ['-Dspring.profiles.active=develop']
 }
