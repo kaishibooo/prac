@@ -27,3 +27,4 @@
 
 ### Java ###
 *.class
+bin/
