@@ -52,6 +52,9 @@ dependencies {
 	//Apache Commons Lang の StringUtils を使用
 	compile("org.apache.commons:commons-lang3:3.3.2")
 
+	compile("commons-beanutils:commons-beanutils:1.9.1")
+
+
 	//<!-- Thymeleaf -->
 	// テンプレートの再利用 Thymeleaf Layout Dialect
 	compile('nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect')

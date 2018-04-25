@@ -1,16 +1,23 @@
 package prac.security.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import prac.security.service.UserService;
 import prac.security.web.LoggingAccessDeniedHandler;
 
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+	@Autowired
+	private UserService userService ;
 
 	@Autowired
 	private LoggingAccessDeniedHandler accessDeniedHandler ;
@@ -21,35 +28,44 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http
 			.authorizeRequests()
 				.antMatchers(
-						"/" ,
+						"/registration" ,
 						"/js/**",
 						"/css/**",
 						"/img/**",
-						"/webjars/**").permitAll()
-				.antMatchers("/user/**").hasRole("USER")
-				.anyRequest().authenticated()
+						"/webjars/**" ).permitAll()
+			//	.anyRequest().authenticated()
 			.and()
-			.formLogin()
-				.loginPage("/login")
-				.permitAll()
+				.formLogin()
+					.loginPage("/login")
+						.permitAll()
 			.and()
-			.logout()
-				.invalidateHttpSession(true)
-				.clearAuthentication(true)
-				.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-				.logoutSuccessUrl("/login?logout")
-				.permitAll()
-			.and()
-			.exceptionHandling()
-				.accessDeniedHandler(accessDeniedHandler) ;
+				.logout()
+					.invalidateHttpSession(true)
+					.clearAuthentication(true)
+					.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+					.logoutSuccessUrl("/login?logout")
+			.permitAll();
+			//.and()
+			//.exceptionHandling()
+			//	.accessDeniedHandler(accessDeniedHandler) ;
+	}
+
+	@Bean
+	public BCryptPasswordEncoder passwordEncoder(){
+		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public DaoAuthenticationProvider authenticationProvider(){
+		DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
+		auth.setUserDetailsService(userService);
+		auth.setPasswordEncoder(passwordEncoder());
+		return auth ;
 	}
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception{
-		auth.inMemoryAuthentication()
-				.withUser("user").password("password").roles("USER")
-			.and()
-				.withUser("manager").password("password").roles("MANAGER");
+		auth.authenticationProvider(authenticationProvider());
 
 	}
 
